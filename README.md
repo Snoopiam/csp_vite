@@ -14,7 +14,13 @@ Hey! I'm Snoop... not a professional coder, but learning to be a **vibecoder**.
 
 When I encountered the infamous Content Security Policy (CSP) warning, it was annoying as hell. So I vibe-coded and found a solution for personal use. It worked for me, so I'm sharing it with anyone who gets stuck like I did.
 
-**⚠️ Disclaimer:** I do not take responsibility for anything. Use at your own risk.
+**📖 Read the full backstory:** [BACKSTORY.md](BACKSTORY.md) - The actual errors that led to this solution.
+
+**⚠️ CRITICAL DISCLAIMER:**
+- This is specifically for **VITE projects only** (not Webpack, Parcel, etc.)
+- This is for **localhost development** (`http://localhost:*`, `ws://localhost:*`)
+- **NOT for production without modifications** (see Production Notes below)
+- I do not take responsibility for anything. Use at your own risk.
 
 ---
 

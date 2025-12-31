@@ -1,0 +1,219 @@
+---
+alwaysApply: true
+---
+
+import path from 'path';
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+
+// ============================================================================
+// CONTENT SECURITY POLICY (CSP) CONFIGURATION FOR VITE DEVELOPMENT
+// ============================================================================
+//
+// ⚠️ CRITICAL: This is for VITE projects and LOCALHOST development ONLY!
+// Do NOT use this config as-is in production. See production notes below.
+//
+// What is CSP?
+// ------------
+// Content Security Policy is a security layer that helps prevent XSS attacks,
+// clickjacking, and other code injection attacks. It tells the browser which
+// sources of content (scripts, styles, images, etc.) are allowed to load.
+//
+// Why use server headers instead of <meta> tags?
+// -----------------------------------------------
+// 1. Server headers are applied BEFORE the page loads (more secure)
+// 2. Meta tags can be bypassed if injected before they're parsed
+// 3. Server headers work for all resources, not just the HTML document
+// 4. Easier to maintain in one place (this config file)
+//
+// How to customize:
+// -----------------
+// Add new sources to the appropriate array below. Common scenarios:
+//   - New API endpoint? Add to 'connect-src'
+//   - New CDN for scripts? Add to 'script-src'
+//   - New font provider? Add to 'font-src' and 'style-src'
+//   - External images? Already covered by 'https:' in 'img-src'
+//
+// Debugging CSP errors:
+// ---------------------
+// 1. Open Chrome DevTools → Console
+// 2. Look for "Refused to load" or "violates Content Security Policy"
+// 3. The error tells you which directive blocked the resource
+// 4. Add the source to the appropriate array below
+//
+// ============================================================================
+
+const CSP_POLICY = {
+  // ---------------------------------------------------------------------------
+  // default-src: Fallback for any directive not explicitly set
+  // ---------------------------------------------------------------------------
+  // 'self'           = Same origin (your domain)
+  // http://localhost:* = Any localhost port (for dev servers)
+  // ws://localhost:*   = WebSocket on localhost (for Vite HMR hot reload)
+  'default-src': ["'self'", 'http://localhost:*', 'ws://localhost:*'],
+
+  // ---------------------------------------------------------------------------
+  // script-src: Controls which scripts can execute
+  // ---------------------------------------------------------------------------
+  // 'self'            = Scripts from same origin
+  // 'unsafe-inline'   = Inline <script> tags (required by some libs)
+  // 'unsafe-eval'     = eval() and new Function() (required by some libs)
+  // http://localhost:* = Dev server scripts
+  // CDNs below        = External script sources used by this project
+  'script-src': [
+    "'self'",
+    "'unsafe-inline'",    // Required for inline scripts, Tailwind JIT
+    "'unsafe-eval'",      // Required for some bundlers and libraries
+    'http://localhost:*', // Vite dev server
+    'https://cdn.tailwindcss.com',  // Tailwind CSS CDN
+    'https://cdn.jsdelivr.net',     // gif.js, heic2any, other libs
+    'https://aistudiocdn.com',      // Google AI Studio SDK (React, etc.)
+  ],
+
+  // ---------------------------------------------------------------------------
+  // style-src: Controls which stylesheets can load
+  // ---------------------------------------------------------------------------
+  // 'self'          = Stylesheets from same origin
+  // 'unsafe-inline' = Inline <style> tags and style="" attributes
+  // Google Fonts    = External font CSS definitions
+  'style-src': [
+    "'self'",
+    "'unsafe-inline'",               // Required for Tailwind, inline styles
+    'https://fonts.googleapis.com',  // Google Fonts CSS
+  ],
+
+  // ---------------------------------------------------------------------------
+  // font-src: Controls which fonts can load
+  // ---------------------------------------------------------------------------
+  // 'self'              = Fonts from same origin
+  // fonts.gstatic.com   = Google Fonts actual font files (.woff2, .ttf)
+  // data:               = Base64-encoded inline fonts
+  'font-src': [
+    "'self'",
+    'https://fonts.gstatic.com',  // Google Fonts files
+    'data:',                       // Inline base64 fonts
+  ],
+
+  // ---------------------------------------------------------------------------
+  // img-src: Controls which images can load
+  // ---------------------------------------------------------------------------
+  // 'self'           = Images from same origin
+  // data:            = Base64-encoded inline images (favicons, small icons)
+  // blob:            = Blob URLs (generated images, canvas exports)
+  // https:           = Any HTTPS image source (external images)
+  // http://localhost:* = Dev server images
+  'img-src': [
+    "'self'",
+    'data:',              // Base64 images (favicon, inline SVGs)
+    'blob:',              // Generated images, canvas.toBlob()
+    'https:',             // Any external HTTPS images
+    'http://localhost:*', // Local dev server images
+  ],
+
+  // ---------------------------------------------------------------------------
+  // connect-src: Controls fetch(), XHR, WebSocket connections
+  // ---------------------------------------------------------------------------
+  // This is where you add API endpoints!
+  // 'self'           = Same origin API calls
+  // http://localhost:* = Local API servers
+  // ws://localhost:*   = WebSocket (Vite HMR)
+  // googleapis.com   = Google APIs (Gemini, etc.)
+  // aistudiocdn.com  = Google AI Studio module imports
+  'connect-src': [
+    "'self'",
+    'http://localhost:*',                        // Local API servers
+    'ws://localhost:*',                          // Vite HMR WebSocket
+    'https://generativelanguage.googleapis.com', // Gemini API
+    'https://*.googleapis.com',                  // Other Google APIs
+    'https://aistudiocdn.com',                   // AI Studio CDN
+  ],
+
+  // ---------------------------------------------------------------------------
+  // worker-src: Controls Web Workers and Service Workers
+  // ---------------------------------------------------------------------------
+  // 'self' = Workers from same origin
+  // blob:  = Blob URL workers (used by gif.js for encoding)
+  'worker-src': [
+    "'self'",
+    'blob:',  // Required for gif.js web workers
+  ],
+};
+
+/**
+ * Converts the CSP_POLICY object into a valid CSP header string.
+ *
+ * Example output:
+ * "default-src 'self' http://localhost:*; script-src 'self' 'unsafe-inline' ..."
+ *
+ * @param policy - Object mapping CSP directives to arrays of sources
+ * @returns Formatted CSP string for use in HTTP headers
+ */
+const buildCSPString = (policy: Record<string, string[]>): string =>
+  Object.entries(policy)
+    .map(([directive, sources]) => `${directive} ${sources.join(' ')}`)
+    .join('; ');
+
+// ============================================================================
+// VITE CONFIGURATION
+// ============================================================================
+export default defineConfig(({ mode }) => {
+    // Load environment variables from .env file
+    // The empty string '' prefix means load all env vars (not just VITE_*)
+    const env = loadEnv(mode, '.', '');
+
+    return {
+      // ------------------------------------------------------------------------
+      // Development Server Configuration
+      // ------------------------------------------------------------------------
+      server: {
+        port: 3000,           // Default port (will auto-increment if in use)
+        host: '0.0.0.0',      // Listen on all interfaces (allows network access)
+
+        // Apply CSP headers to all responses from the dev server
+        // This is more secure than using <meta> tags in index.html
+        headers: {
+          'Content-Security-Policy': buildCSPString(CSP_POLICY),
+        },
+      },
+
+      // ------------------------------------------------------------------------
+      // Plugins
+      // ------------------------------------------------------------------------
+      plugins: [
+        react(),  // React Fast Refresh for HMR
+      ],
+
+      // ------------------------------------------------------------------------
+      // Environment Variable Injection
+      // ------------------------------------------------------------------------
+      // WARNING: SECURITY-1 - API key is exposed in client bundle!
+      // ================================================================
+      // These values are embedded directly into the JavaScript bundle,
+      // meaning anyone can extract the API key from browser DevTools.
+      //
+      // REQUIRED FIX for Production:
+      // 1. Implement a backend proxy server (Node.js, Cloudflare Worker, etc.)
+      // 2. Backend validates session tokens before making API calls
+      // 3. API key lives only on the server, never sent to client
+      // 4. Client calls your backend, backend calls Gemini API
+      //
+      // This is acceptable for local development but NOT for production.
+      // See AUDIT-CHECKLIST.md SECURITY-1 for detailed remediation steps.
+      // ================================================================
+      define: {
+        'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      },
+
+      // ------------------------------------------------------------------------
+      // Module Resolution
+      // ------------------------------------------------------------------------
+      resolve: {
+        alias: {
+          // '@' points to project root, enabling imports like:
+          // import { Button } from '@/components/Button'
+          '@': path.resolve(__dirname, '.'),
+        },
+      },
+    };
+});

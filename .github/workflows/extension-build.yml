@@ -1,14 +1,18 @@
-name: Build VS Code Extension
+# Extension build disabled - Priority 1 (task system) is production ready
+# Extension is a work-in-progress bonus feature
+# Uncomment below to re-enable when extension is ready
 
-on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'extension/**'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'extension/**'
+# name: Build VS Code Extension
+# 
+# on:
+#   push:
+#     branches: [ main ]
+#     paths:
+#       - 'extension/**'
+#   pull_request:
+#     branches: [ main ]
+#     paths:
+#       - 'extension/**'
 
 jobs:
   build:

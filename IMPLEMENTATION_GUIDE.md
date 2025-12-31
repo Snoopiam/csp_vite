@@ -1,6 +1,8 @@
 # Implementation Guide - Vite CSP Fix
 
-> **Complete guide for implementing CSP in Vite projects**
+> **Complete guide for implementing CSP in Vite projects (localhost development)**
+
+⚠️ **CRITICAL:** This toolkit is for **VITE projects** running on **localhost** during **development**. Do NOT use these configs as-is in production.
 
 ## 🎯 Implementation Methods (Priority Order)
 

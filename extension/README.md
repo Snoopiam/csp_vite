@@ -1,6 +1,8 @@
 # Vite CSP Helper
 
-Easily add and manage Content Security Policy (CSP) configuration for your Vite projects.
+Easily add and manage Content Security Policy (CSP) configuration for your **Vite projects** during **localhost development**.
+
+⚠️ **IMPORTANT:** This extension generates CSP configs for development only. You must modify the generated config before deploying to production (remove `'unsafe-inline'`, `'unsafe-eval'`, and localhost references).
 
 ## Features
 

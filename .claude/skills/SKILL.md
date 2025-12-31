@@ -1,10 +1,8 @@
 # Vite CSP Fix
 
-> **Claude Skill** | Security | Vite Configuration | v1.0.0
+Apply Content Security Policy configuration to **VITE projects only** to prevent CSP errors during **localhost development**.
 
-Apply Content Security Policy configuration to any Vite project to prevent CSP errors during development.
-
-**🤖 AI Agent Note:** See [CLAUDE.md](CLAUDE.md) for implementation guidance.
+⚠️ **IMPORTANT:** This is for development on `http://localhost:*` and `ws://localhost:*`. Do NOT use as-is in production.
 
 ## When to Use This Skill
 
@@ -135,6 +133,15 @@ export default defineConfig({
 
 ## Important Notes
 
-1. **Remove meta tags** - Delete any `<meta http-equiv="Content-Security-Policy">` from index.html when using server headers
-2. **Extension errors** - "listener indicated an asynchronous response" errors are from browser extensions, not CSP
-3. **Production** - You may want stricter policies in production (remove 'unsafe-inline', 'unsafe-eval')
+### ⚠️ CRITICAL - Read Before Using
+1. **VITE PROJECTS ONLY** - This solution is specifically for Vite, not Webpack/Parcel/other bundlers
+2. **LOCALHOST DEVELOPMENT ONLY** - Uses `http://localhost:*` and `ws://localhost:*` for development
+3. **NOT FOR PRODUCTION** - Remove `'unsafe-inline'`, `'unsafe-eval'`, and localhost URLs before deploying
+4. **Remove meta tags** - Delete any `<meta http-equiv="Content-Security-Policy">` from index.html when using server headers
+5. **Extension errors** - "listener indicated an asynchronous response" errors are from browser extensions, not CSP
+
+### For Production
+- Remove `'unsafe-inline'` and `'unsafe-eval'` (use nonces or hashes)
+- Remove all `localhost:*` references
+- Use specific domains instead of wildcards
+- Test thoroughly with your production environment

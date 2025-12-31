@@ -6,7 +6,12 @@
 // PRIORITY 1: Automated Task System (Immediate Use)
 //
 // This Node.js script automatically adds Content Security Policy configuration
-// to Vite projects without requiring any npm packages or dependencies.
+// to VITE projects (specifically for localhost development).
+//
+// ⚠️ IMPORTANT: This config is for DEVELOPMENT ONLY!
+//    - Uses http://localhost:* and ws://localhost:*
+//    - Includes 'unsafe-inline' and 'unsafe-eval'
+//    - Must be modified before production deployment
 //
 // Usage:
 //   node add-csp.js                    # Add full CSP configuration
