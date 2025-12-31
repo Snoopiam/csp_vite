@@ -1,0 +1,114 @@
+// ============================================================================
+// VS CODE EXTENSION - VITE CSP HELPER
+// ============================================================================
+//
+// PRIORITY 2: VS Code Extension (Most Powerful)
+//
+// Full-featured VS Code extension for managing Content Security Policy in
+// Vite projects with interactive commands and DevTools error parsing.
+//
+// Development:
+//   cd extension/
+//   npm install
+//   npm run watch  # Compile on save
+//   Press F5 to launch Extension Development Host
+//
+// Publishing:
+//   npm install -g @vscode/vsce
+//   vsce package  # Creates .vsix file
+//   vsce publish  # Publishes to VS Code Marketplace
+//
+// Commands:
+//   - Vite: Add CSP Configuration
+//   - Vite: Add CSP Source
+//   - Vite: Fix CSP Error from DevTools
+//
+// ============================================================================
+
+{
+  "name": "vite-csp-helper",
+  "displayName": "Vite CSP Helper",
+  "description": "Easily configure Content Security Policy for Vite projects",
+  "version": "0.1.0",
+  "publisher": "your-publisher-name",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Snippets"
+  ],
+  "keywords": [
+    "vite",
+    "csp",
+    "security",
+    "content-security-policy",
+    "tailwind"
+  ],
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "workspaceContains:**/vite.config.*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vite-csp.addConfiguration",
+        "title": "Vite: Add CSP Configuration"
+      },
+      {
+        "command": "vite-csp.addSource",
+        "title": "Vite: Add CSP Source"
+      },
+      {
+        "command": "vite-csp.fixCSPError",
+        "title": "Vite: Fix CSP Error from DevTools"
+      }
+    ],
+    "configuration": {
+      "title": "Vite CSP Helper",
+      "properties": {
+        "viteCsp.autoBackup": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically create backup files before modifying vite.config"
+        },
+        "viteCsp.defaultSources": {
+          "type": "object",
+          "default": {
+            "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'", "http://localhost:*", "https://cdn.tailwindcss.com"],
+            "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
+            "img-src": ["'self'", "data:", "blob:", "https:", "http://localhost:*"],
+            "connect-src": ["'self'", "http://localhost:*", "ws://localhost:*"],
+            "worker-src": ["'self'", "blob:"]
+          },
+          "description": "Default CSP sources to include when generating configuration"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.50.0",
+    "typescript": "^5.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Snoopiam/csp_vite.git"
+  },
+  "license": "MIT"
+}

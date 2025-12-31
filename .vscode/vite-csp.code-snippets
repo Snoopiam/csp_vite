@@ -1,0 +1,130 @@
+// ============================================================================
+// VS CODE SNIPPETS - VITE CSP CONFIGURATION
+// ============================================================================
+//
+// PRIORITY 3: Code Snippets (Manual Control)
+//
+// This file contains VS Code snippets for quickly inserting CSP configuration
+// into Vite projects. Use these when you want manual control over the setup.
+//
+// Installation:
+//   1. Copy this file to your project's .vscode/ folder, OR
+//   2. Copy to global snippets: File → Preferences → User Snippets
+//
+// Usage:
+//   - Type 'vite-csp' in any .ts or .js file
+//   - Press Tab to expand
+//   - Navigate through placeholders with Tab
+//
+// Snippets Included:
+//   1. vite-csp        - Full CSP configuration
+//   2. vite-server-headers - Server headers only
+//   3. csp-add         - Add single CSP source
+//
+// ============================================================================
+
+{
+  "Vite CSP Configuration": {
+    "prefix": ["vite-csp", "csp-config"],
+    "scope": "typescript,javascript",
+    "description": "Insert complete CSP configuration for Vite projects",
+    "body": [
+      "// ============================================================================",
+      "// CONTENT SECURITY POLICY (CSP) CONFIGURATION",
+      "// ============================================================================",
+      "//",
+      "// Debugging CSP errors:",
+      "// 1. Open Chrome DevTools → Console",
+      "// 2. Look for \"Refused to load\" or \"violates Content Security Policy\"",
+      "// 3. The error tells you which directive blocked the resource",
+      "// 4. Add the source to the appropriate array below",
+      "//",
+      "// ============================================================================",
+      "",
+      "const CSP_POLICY = {",
+      "  // default-src: Fallback for any directive not explicitly set",
+      "  // 'self' = Same origin, localhost:* = Any local port, ws: = WebSocket for HMR",
+      "  'default-src': [\"'self'\", 'http://localhost:*', 'ws://localhost:*'],",
+      "",
+      "  // script-src: Controls which scripts can execute",
+      "  // Add new CDNs here when you get script-related CSP errors",
+      "  'script-src': [",
+      "    \"'self'\",",
+      "    \"'unsafe-inline'\",    // Required for inline scripts, Tailwind JIT",
+      "    \"'unsafe-eval'\",      // Required for some bundlers and libraries",
+      "    'http://localhost:*', // Vite dev server",
+      "    'https://cdn.tailwindcss.com',  // Tailwind CSS CDN",
+      "    ${1:'https://cdn.jsdelivr.net'},     // Popular CDN for npm packages",
+      "  ],",
+      "",
+      "  // style-src: Controls which stylesheets can load",
+      "  'style-src': [",
+      "    \"'self'\",",
+      "    \"'unsafe-inline'\",               // Required for Tailwind, inline styles",
+      "    'https://fonts.googleapis.com',  // Google Fonts CSS",
+      "  ],",
+      "",
+      "  // font-src: Controls which fonts can load",
+      "  'font-src': [",
+      "    \"'self'\",",
+      "    'https://fonts.gstatic.com',  // Google Fonts files",
+      "    'data:',                       // Inline base64 fonts",
+      "  ],",
+      "",
+      "  // img-src: Controls which images can load",
+      "  'img-src': [",
+      "    \"'self'\",",
+      "    'data:',              // Base64 images (favicon, inline SVGs)",
+      "    'blob:',              // Generated images, canvas.toBlob()",
+      "    'https:',             // Any external HTTPS images",
+      "    'http://localhost:*', // Local dev server images",
+      "  ],",
+      "",
+      "  // connect-src: Controls fetch(), XHR, WebSocket connections",
+      "  // THIS IS WHERE YOU ADD API ENDPOINTS!",
+      "  'connect-src': [",
+      "    \"'self'\",",
+      "    'http://localhost:*',                        // Local API servers",
+      "    'ws://localhost:*',                          // Vite HMR WebSocket",
+      "    ${2:'https://api.example.com'},              // Add your API here",
+      "  ],",
+      "",
+      "  // worker-src: Controls Web Workers and Service Workers",
+      "  'worker-src': [",
+      "    \"'self'\",",
+      "    'blob:',  // Required for libraries like gif.js",
+      "  ],",
+      "};",
+      "",
+      "// Converts the CSP_POLICY object into a valid CSP header string",
+      "const buildCSPString = (policy: Record<string, string[]>): string =>",
+      "  Object.entries(policy)",
+      "    .map(([directive, sources]) => `\\${directive} \\${sources.join(' ')}\\`)",
+      "    .join('; ');",
+      "$0"
+    ]
+  },
+  "Vite Server Headers": {
+    "prefix": ["vite-server-headers", "csp-server"],
+    "scope": "typescript,javascript",
+    "description": "Add server headers configuration to Vite config",
+    "body": [
+      "server: {",
+      "  headers: {",
+      "    'Content-Security-Policy': buildCSPString(CSP_POLICY),",
+      "  },",
+      "  $0",
+      "},"
+    ]
+  },
+  "Add CSP Source": {
+    "prefix": ["csp-add", "add-csp-source"],
+    "scope": "typescript,javascript",
+    "description": "Add a new source to CSP directive",
+    "body": [
+      "'${1|script-src,style-src,font-src,img-src,connect-src,worker-src|}': [",
+      "  ${2:'https://example.com'},",
+      "],$0"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+name: Test Task System
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.vscode/**'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '.vscode/**'
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18.x, 20.x]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Create test Vite project
+      run: |
+        npm create vite@latest test-project -- --template react-ts
+        echo "import { defineConfig } from 'vite'; export default defineConfig({});" > test-project/vite.config.ts
+
+    - name: Test add-csp.js script
+      working-directory: ./test-project
+      run: node ../.vscode/add-csp.js
+
+    - name: Verify CSP was added
+      working-directory: ./test-project
+      shell: bash
+      run: |
+        if grep -q "CSP_POLICY" vite.config.ts; then
+          echo "✅ CSP configuration successfully added"
+        else
+          echo "❌ CSP configuration not found"
+          exit 1
+        fi

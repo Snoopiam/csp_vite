@@ -1,0 +1,59 @@
+// ============================================================================
+// VS CODE TASKS - AUTOMATED CSP CONFIGURATION
+// ============================================================================
+//
+// PRIORITY 1: Automated Task System (Immediate Use)
+//
+// This file defines VS Code tasks for automated CSP setup in Vite projects.
+//
+// Usage:
+//   1. Press Ctrl+Shift+P (Windows/Linux) or Cmd+Shift+P (Mac)
+//   2. Type "Run Task"
+//   3. Select one of the tasks below
+//
+// Tasks:
+//   - "Vite: Add CSP Configuration" - Adds complete CSP setup to vite.config
+//   - "Vite: Add CSP Source" - Interactive wizard to add new CSP sources
+//
+// Requirements:
+//   - Node.js installed
+//   - Vite project with vite.config.ts/js/mjs
+//
+// ============================================================================
+
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Vite: Add CSP Configuration",
+      "type": "shell",
+      "command": "node",
+      "args": ["${workspaceFolder}/.vscode/add-csp.js"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
+      "label": "Vite: Add CSP Source",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/.vscode/add-csp.js",
+        "--add-source"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      }
+    }
+  ]
+}
